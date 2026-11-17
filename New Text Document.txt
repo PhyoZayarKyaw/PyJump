@@ -1,0 +1,16 @@
+Setting up a Stage Select screen
+
+Create a new Scene (or a UI panel within an existing menu scene) — name it StageSelect.
+Add a Canvas (UI → Canvas), and inside it, one Button per level you want selectable (UI → Button - TextMeshPro or legacy Button).
+Label each button's text (e.g. "1-1", "1-2", "Teaching Stage", "Test Stage") so the player knows what they're picking.
+On each button's GameObject, Add Component → StageSelectButton.
+Set World and Stage fields to match — e.g. the "1-2" button gets World = 1, Stage = 2.
+
+That's it — StageSelectButton.Start() automatically wires itself to the Button's onClick event via code, so you don't need to manually drag anything into the Button's OnClick() list in the Inspector.
+One important thing about GameManager persistence
+Since GameManager uses DontDestroyOnLoad and is a singleton, it needs to exist before the player reaches your Stage Select screen — otherwise GameManager.Instance will be null when a button is clicked. The cleanest way to guarantee this:
+
+Put the GameManager GameObject in your very first scene (whatever loads first — a boot/splash/menu scene), so its Awake() runs once at the start of the session and persists through every subsequent scene load, including into Stage Select and every level.
+Don't put a GameManager GameObject in Stage Select or any level scenes themselves — if one already exists (from the first scene), the Awake() singleton check (if (Instance != null) DestroyImmediate(gameObject)) will just clean up the duplicate anyway, but it's cleaner to just not add duplicates in the first place.
+
+Does your project currently have a dedicated first/boot scene, or does it currently just open straight into 1-1? If it's the latter, I'd suggest making that scene the "menu/stage-select" scene going forward, since it's already guaranteed to load first.
